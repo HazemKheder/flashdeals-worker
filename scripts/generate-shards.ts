@@ -17,11 +17,15 @@ for (const shard of SHARDS) {
   const vercelPath = resolve(root, 'apps', shard.id, 'vercel.json');
 
   mkdirSync(dirname(vercelPath), { recursive: true });
+  // Do not use `npm install --prefix=../..` — it breaks npm workspaces
+  // ("Tracker idealTree already exists") on Vercel.
   writeFileSync(
     vercelPath,
     `${JSON.stringify(
       {
         $schema: 'https://openapi.vercel.sh/vercel.json',
+        installCommand: 'cd ../.. && npm install',
+        buildCommand: 'next build',
         schedules,
       },
       null,

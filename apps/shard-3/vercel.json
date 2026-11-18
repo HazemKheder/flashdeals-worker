@@ -1,5 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd ../.. && npm install",
+  "buildCommand": "next build",
   "schedules": {
     "scrape-it-coupons": {
       "schedule": "10 0 * * *",

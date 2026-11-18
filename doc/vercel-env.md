@@ -15,9 +15,11 @@ Never add `SUPABASE_SERVICE_ROLE_KEY`. Writes use the anon key and existing RLS 
 | Setting | Value |
 |---------|--------|
 | Root Directory | `apps/shard-N` |
-| Install Command | `cd ../.. && npm install` |
-| Build Command | `next build` |
+| Install Command | leave empty / default — `vercel.json` sets `cd ../.. && npm install` |
+| Build Command | leave empty / default — `vercel.json` sets `next build` |
 | Framework | Next.js |
+
+Do **not** use `npm install --prefix=../..`. That breaks npm workspaces on Vercel with `Tracker "idealTree" already exists`. If you already set that in Project Settings, clear the override so the repo `vercel.json` wins.
 
 Before the first deploy (and after editing `packages/crawler/src/shards.ts`), run `npm run generate:shards` and commit the updated `apps/*/vercel.json` files.
 
