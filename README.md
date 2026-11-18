@@ -34,8 +34,8 @@ Do not set the Supabase service role key.
 Create four projects from this repo. For each:
 
 1. Root Directory = `apps/shard-N`
-2. Install Command = `cd ../.. && npm install`
-3. Build Command = `cd ../.. && npm run generate:shards && cd apps/shard-N && npm run build` (or default `next build` after generate once)
+2. Leave Install / Build empty in the UI — `vercel.json` sets `cd ../.. && npm install` and `next build`
+3. Do **not** use `npm install --prefix=../..` (breaks npm workspaces on Vercel)
 4. Add the three env vars above
 5. Production branch = `main`
 
