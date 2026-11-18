@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -67,25 +67,48 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 `;
 
-const layout = `export const metadata = {
-  title: 'FlashDeals Crawler',
-  description: 'Crawler-only worker shard',
+const layout = `import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'FlashDeals — Coming Soon',
+  description: 'FlashDeals is almost ready. Discover timed Amazon deals soon.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
 }
 `;
 
-const page = (id) => `export default function Home() {
+const page = (_id) => `export default function Home() {
   return (
-    <main style={{ fontFamily: 'system-ui', padding: 24 }}>
-      <h1>FlashDeals crawler — ${id}</h1>
-      <p>Cron-only worker. No public UI.</p>
+    <main className="coming-soon">
+      <div className="coming-soon__orb coming-soon__orb--a" aria-hidden="true" />
+      <div className="coming-soon__orb coming-soon__orb--b" aria-hidden="true" />
+
+      <div className="coming-soon__content">
+        <p className="coming-soon__brand">FlashDeals</p>
+        <span className="coming-soon__rule" aria-hidden="true" />
+        <h1 className="coming-soon__headline">Coming soon</h1>
+        <p className="coming-soon__copy">
+          We&apos;re lining up the best timed Amazon deals. The full experience is almost ready.
+        </p>
+        <a className="coming-soon__cta" href="https://www.flashdeals.app">
+          Visit flashdeals.app
+        </a>
+      </div>
     </main>
   );
 }
@@ -126,11 +149,14 @@ function write(filePath, contents) {
   writeFileSync(filePath, contents, 'utf8');
 }
 
+const globalsCss = readFileSync(resolve(root, 'apps/shard-1/app/globals.css'), 'utf8');
+
 for (const id of shards) {
   const app = resolve(root, 'apps', id);
   write(resolve(app, 'package.json'), packageJson(id));
   write(resolve(app, 'tsconfig.json'), tsconfig);
   write(resolve(app, 'next.config.ts'), nextConfig);
+  write(resolve(app, 'app/globals.css'), globalsCss);
   write(resolve(app, 'app/layout.tsx'), layout);
   write(resolve(app, 'app/page.tsx'), page(id));
   write(resolve(app, 'app/api/cron/scrape/route.ts'), scrapeRoute);
