@@ -39,11 +39,13 @@ Create four projects from this repo. For each:
 4. Add the three env vars above
 5. Production branch = `main`
 
-Cron schedules live in each app’s committed `vercel.json`. Regenerate after changing `packages/crawler/src/shards.ts`:
+Schedules (Vercel Schedules beta, not legacy Cron Jobs) live in each app’s committed `vercel.json`. Regenerate after changing `packages/crawler/src/shards.ts`:
 
 ```bash
 npm run generate:shards
 ```
+
+After deploy, check the project **Schedules** tab and use **Run Schedule** to test without waiting.
 
 ## Local
 

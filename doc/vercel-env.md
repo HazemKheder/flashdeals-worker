@@ -20,3 +20,9 @@ Never add `SUPABASE_SERVICE_ROLE_KEY`. Writes use the anon key and existing RLS 
 | Framework | Next.js |
 
 Before the first deploy (and after editing `packages/crawler/src/shards.ts`), run `npm run generate:shards` and commit the updated `apps/*/vercel.json` files.
+
+## Schedules (not Cron Jobs)
+
+Shard apps use Vercel **Schedules** (`schedules` in `vercel.json`), migrated from legacy Cron Jobs. Handlers stay on `GET` via `"requestMethod": "GET"`. `CRON_SECRET` auth is unchanged.
+
+After deploy, open the project **Schedules** tab (not only Cron Jobs) and use **Run Schedule** to smoke-test.

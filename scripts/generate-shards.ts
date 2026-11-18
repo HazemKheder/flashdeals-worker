@@ -3,20 +3,32 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   SHARDS,
-  MAX_VERCEL_CRONS,
+  MAX_VERCEL_SCHEDULES,
   buildShardEntries,
-  generateShardCrons,
+  generateShardSchedules,
 } from '../packages/crawler/src/shards';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 for (const shard of SHARDS) {
   const entries = buildShardEntries(shard);
-  const crons = generateShardCrons(shard);
+  const schedules = generateShardSchedules(shard);
+  const count = Object.keys(schedules).length;
   const vercelPath = resolve(root, 'apps', shard.id, 'vercel.json');
 
   mkdirSync(dirname(vercelPath), { recursive: true });
-  writeFileSync(vercelPath, `${JSON.stringify({ crons }, null, 2)}\n`, 'utf8');
+  writeFileSync(
+    vercelPath,
+    `${JSON.stringify(
+      {
+        $schema: 'https://openapi.vercel.sh/vercel.json',
+        schedules,
+      },
+      null,
+      2,
+    )}\n`,
+    'utf8',
+  );
 
   const byJob: Record<string, number> = {};
   const byRegion: Record<string, number> = {};
@@ -26,8 +38,8 @@ for (const shard of SHARDS) {
   }
 
   console.log(
-    `${shard.id}: ${crons.length}/${MAX_VERCEL_CRONS} crons | regions=${shard.regions.join(',')} | jobs=${JSON.stringify(byJob)} | byRegion=${JSON.stringify(byRegion)}`,
+    `${shard.id}: ${count}/${MAX_VERCEL_SCHEDULES} schedules | regions=${shard.regions.join(',')} | jobs=${JSON.stringify(byJob)} | byRegion=${JSON.stringify(byRegion)}`,
   );
 }
 
-console.log('Wrote vercel.json for all shards.');
+console.log('Wrote vercel.json schedules for all shards.');

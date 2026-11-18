@@ -1,192 +1,240 @@
 {
-  "crons": [
-    {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "schedules": {
+    "scrape-ca-coupons": {
+      "schedule": "15 0 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=coupons",
-      "schedule": "15 0 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-lightning-deals": {
+      "schedule": "25 0 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=lightning-deals",
-      "schedule": "25 0 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-computers": {
+      "schedule": "35 0 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=computers",
-      "schedule": "35 0 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-home-kitchen": {
+      "schedule": "45 0 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=home-kitchen",
-      "schedule": "45 0 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-fashion": {
+      "schedule": "55 0 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=fashion",
-      "schedule": "55 0 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-beauty": {
+      "schedule": "5 1 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=beauty",
-      "schedule": "5 1 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-toys": {
+      "schedule": "15 1 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=toys",
-      "schedule": "15 1 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-automotive": {
+      "schedule": "25 1 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=automotive",
-      "schedule": "25 1 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-grocery": {
+      "schedule": "35 1 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=grocery",
-      "schedule": "35 1 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-smartphones": {
+      "schedule": "45 1 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=smartphones",
-      "schedule": "45 1 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-garden": {
+      "schedule": "55 1 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=garden",
-      "schedule": "55 1 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-baby": {
+      "schedule": "5 2 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=baby",
-      "schedule": "5 2 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-coupons": {
+      "schedule": "15 2 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=coupons",
-      "schedule": "15 2 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-lightning-deals": {
+      "schedule": "25 2 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=lightning-deals",
-      "schedule": "25 2 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-computers": {
+      "schedule": "35 2 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=computers",
-      "schedule": "35 2 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-home-kitchen": {
+      "schedule": "45 2 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=home-kitchen",
-      "schedule": "45 2 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-fashion": {
+      "schedule": "55 2 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=fashion",
-      "schedule": "55 2 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-beauty": {
+      "schedule": "5 3 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=beauty",
-      "schedule": "5 3 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-toys": {
+      "schedule": "15 3 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=toys",
-      "schedule": "15 3 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-automotive": {
+      "schedule": "25 3 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=automotive",
-      "schedule": "25 3 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-grocery": {
+      "schedule": "35 3 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=grocery",
-      "schedule": "35 3 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-smartphones": {
+      "schedule": "45 3 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=smartphones",
-      "schedule": "45 3 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-garden": {
+      "schedule": "55 3 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=garden",
-      "schedule": "55 3 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "validate-ca-baby": {
+      "schedule": "5 4 * * *",
       "path": "/api/cron/validate?region=ca&maxProducts=25&category=baby",
-      "schedule": "5 4 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-coupons": {
+      "schedule": "15 4 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=coupons",
-      "schedule": "15 4 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-lightning-deals": {
+      "schedule": "25 4 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=lightning-deals",
-      "schedule": "25 4 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-computers": {
+      "schedule": "35 4 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=computers",
-      "schedule": "35 4 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-home-kitchen": {
+      "schedule": "45 4 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=home-kitchen",
-      "schedule": "45 4 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-fashion": {
+      "schedule": "55 4 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=fashion",
-      "schedule": "55 4 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-beauty": {
+      "schedule": "5 5 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=beauty",
-      "schedule": "5 5 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-toys": {
+      "schedule": "15 5 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=toys",
-      "schedule": "15 5 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-automotive": {
+      "schedule": "25 5 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=automotive",
-      "schedule": "25 5 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "price-check-ca-grocery": {
+      "schedule": "35 5 * * *",
       "path": "/api/cron/price-check?region=ca&maxProducts=50&category=grocery",
-      "schedule": "35 5 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-de-coupons-pass2": {
+      "schedule": "45 5 * * *",
       "path": "/api/cron/scrape?region=de&maxProducts=25&category=coupons",
-      "schedule": "45 5 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-us-coupons-pass2": {
+      "schedule": "55 5 * * *",
       "path": "/api/cron/scrape?region=us&maxProducts=25&category=coupons",
-      "schedule": "55 5 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-uk-coupons-pass2": {
+      "schedule": "5 6 * * *",
       "path": "/api/cron/scrape?region=uk&maxProducts=25&category=coupons",
-      "schedule": "5 6 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-fr-coupons-pass2": {
+      "schedule": "15 6 * * *",
       "path": "/api/cron/scrape?region=fr&maxProducts=25&category=coupons",
-      "schedule": "15 6 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-it-coupons-pass2": {
+      "schedule": "25 6 * * *",
       "path": "/api/cron/scrape?region=it&maxProducts=25&category=coupons",
-      "schedule": "25 6 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-es-coupons-pass2": {
+      "schedule": "35 6 * * *",
       "path": "/api/cron/scrape?region=es&maxProducts=25&category=coupons",
-      "schedule": "35 6 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-coupons-pass2": {
+      "schedule": "45 6 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=coupons",
-      "schedule": "45 6 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-de-lightning-deals-pass2": {
+      "schedule": "55 6 * * *",
       "path": "/api/cron/scrape?region=de&maxProducts=25&category=lightning-deals",
-      "schedule": "55 6 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-us-lightning-deals-pass2": {
+      "schedule": "5 7 * * *",
       "path": "/api/cron/scrape?region=us&maxProducts=25&category=lightning-deals",
-      "schedule": "5 7 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-uk-lightning-deals-pass2": {
+      "schedule": "15 7 * * *",
       "path": "/api/cron/scrape?region=uk&maxProducts=25&category=lightning-deals",
-      "schedule": "15 7 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-fr-lightning-deals-pass2": {
+      "schedule": "25 7 * * *",
       "path": "/api/cron/scrape?region=fr&maxProducts=25&category=lightning-deals",
-      "schedule": "25 7 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-it-lightning-deals-pass2": {
+      "schedule": "35 7 * * *",
       "path": "/api/cron/scrape?region=it&maxProducts=25&category=lightning-deals",
-      "schedule": "35 7 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-es-lightning-deals-pass2": {
+      "schedule": "45 7 * * *",
       "path": "/api/cron/scrape?region=es&maxProducts=25&category=lightning-deals",
-      "schedule": "45 7 * * *"
+      "requestMethod": "GET"
     },
-    {
+    "scrape-ca-lightning-deals-pass2": {
+      "schedule": "55 7 * * *",
       "path": "/api/cron/scrape?region=ca&maxProducts=25&category=lightning-deals",
-      "schedule": "55 7 * * *"
+      "requestMethod": "GET"
     }
-  ]
+  }
 }

@@ -15,8 +15,9 @@ export {
   CRON_CATEGORIES,
   CRON_JOBS,
   SHARDS,
-  MAX_VERCEL_CRONS,
+  MAX_VERCEL_SCHEDULES,
   buildShardEntries,
+  generateShardSchedules,
   generateShardCrons,
   getShard,
 } from './shards';
@@ -24,7 +25,8 @@ export type {
   CronRegion,
   CronCategory,
   CronEntry,
-  VercelCron,
+  VercelSchedule,
+  VercelSchedulesMap,
   ShardDefinition,
 } from './shards';
 export type {
