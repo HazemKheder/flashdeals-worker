@@ -1,0 +1,27 @@
+{
+  "name": "flashdeals-worker",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "generate:shards": "tsx scripts/generate-shards.ts",
+    "scraper": "tsx bin/scraper-worker.ts",
+    "scraper:once": "tsx bin/scraper-worker.ts --once",
+    "scraper:discovery": "tsx bin/scraper-worker.ts --job=discovery",
+    "scraper:validator": "tsx bin/scraper-worker.ts --job=validator",
+    "scraper:price-checker": "tsx bin/scraper-worker.ts --job=price_checker",
+    "build": "npm run generate:shards && npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "dotenv": "^17.3.1",
+    "node-cron": "^4.2.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.0",
+    "@types/node-cron": "^3.0.11"
+  }
+}
