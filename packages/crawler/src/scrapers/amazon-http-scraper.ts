@@ -125,7 +125,11 @@ export class AmazonHttpScraper {
   private getHeaders(language?: string): Record<string, string> {
     let acceptLang = 'en-US,en;q=0.9';
     if (language?.includes('de')) acceptLang = 'de-DE,de;q=0.9,en;q=0.8';
+    else if (language?.includes('fr')) acceptLang = 'fr-FR,fr;q=0.9,en;q=0.8';
+    else if (language?.includes('it')) acceptLang = 'it-IT,it;q=0.9,en;q=0.8';
+    else if (language?.includes('es')) acceptLang = 'es-ES,es;q=0.9,en;q=0.8';
     else if (language?.includes('GB')) acceptLang = 'en-GB,en;q=0.9';
+    else if (language?.includes('CA')) acceptLang = 'en-CA,en;q=0.9';
 
     return {
       'User-Agent': this.randomUserAgent(),
@@ -256,6 +260,18 @@ export class AmazonHttpScraper {
   extractAsin(url: string): string | null {
     const match = url.match(/\/dp\/([A-Z0-9]{10})|\/gp\/product\/([A-Z0-9]{10})/);
     return match ? (match[1] || match[2]) : null;
+  }
+
+  /** Deal cards often leave img alt empty; the slug before /dp/ is still a usable title. */
+  private titleFromDealUrl(href: string): string | undefined {
+    const match = href.match(/\/([^/?#]+)\/dp\/[A-Z0-9]{10}/i);
+    if (!match) return undefined;
+    try {
+      const words = decodeURIComponent(match[1]).replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+      return words.length > 10 ? words : undefined;
+    } catch {
+      return undefined;
+    }
   }
 
   /** Exclude credit cards, gift-card promos, and other non-product items from deal scraping. */
@@ -631,6 +647,7 @@ export class AmazonHttpScraper {
     const seenAsins = new Set<string>();
 
     const dealSelectors = [
+      '.dcl-product',
       '[data-testid="product-card"]',
       '[data-testid="deal-card"]',
       '[data-component-type="s-search-result"]',
@@ -659,21 +676,28 @@ export class AmazonHttpScraper {
         seenAsins.add(asin);
 
         const title =
+          $el.find('.dcl-product-label').first().text().trim() ||
           $el.find('.a-truncate-full.a-offscreen').first().text().trim() ||
           $el.find('p[id^="title-"]').first().text().trim() ||
           $el.find('h2, .a-text-normal, [data-component-type="s-product-title"]').first().text().trim() ||
           $el.find('a').first().attr('title') ||
-          $el.find('img').first().attr('alt');
+          $el.find('img').first().attr('alt') ||
+          this.titleFromDealUrl(href);
 
         const priceText =
+          $el.find('.dcl-product-price-new .a-offscreen').first().text() ||
           $el.find('[data-testid="price-section"] .a-price .a-offscreen').first().text() ||
           $el.find('.a-price .a-offscreen, .a-price-whole').first().text();
         const price = this.parsePrice(priceText);
 
-        const origPriceText = $el.find('.a-text-price .a-offscreen, .a-price.a-text-price').first().text();
+        const origPriceText =
+          $el.find('.dcl-product-price-old .a-offscreen').first().text() ||
+          $el.find('.a-text-price .a-offscreen, .a-price.a-text-price').first().text();
         const originalPrice = this.parsePrice(origPriceText);
 
-        const discountText = $el.find('.savingsPercentage, .a-color-price').first().text();
+        const discountText =
+          $el.find('.dcl-badge').first().text() ||
+          $el.find('.savingsPercentage, .a-color-price').first().text();
         const discountMatch = discountText.match(/(\d+)/);
         const discountPercent = discountMatch
           ? parseFloat(discountMatch[1])
@@ -682,6 +706,7 @@ export class AmazonHttpScraper {
             : undefined;
 
         const rawImgUrl =
+          $el.find('img.dcl-dynamic-image').first().attr('src') ||
           $el.find('img[data-a-dynamic-image]').first().attr('src') ||
           $el.find('img.s-image').first().attr('src') ||
           $el.find('img').first().attr('src') ||
@@ -722,7 +747,12 @@ export class AmazonHttpScraper {
         seenAsins.add(asin);
 
         const fullUrl = href.startsWith('http') ? href : `https://www.${this.region.domain}${href}`;
-        const title = $(el).attr('title') || $(el).text().trim() || $(el).find('img').attr('alt');
+        const title =
+          $(el).find('.dcl-product-label').first().text().trim() ||
+          $(el).attr('title') ||
+          $(el).text().trim() ||
+          $(el).find('img').attr('alt') ||
+          this.titleFromDealUrl(href);
         if (title && title.length > 5 && !this.isNonProductTitle(title)) {
           products.push({
             asin,
@@ -761,16 +791,24 @@ export class AmazonHttpScraper {
             mainSeen.add(asin);
 
             const title =
+              $el.find('.dcl-product-label').first().text().trim() ||
               $el.find('h2, .a-text-normal, [data-component-type="s-product-title"]').first().text().trim() ||
               $el.find('a').first().attr('title') ||
-              $el.find('img').first().attr('alt');
+              $el.find('img').first().attr('alt') ||
+              this.titleFromDealUrl(href);
             if (!title || title.length <= 3 || this.isNonProductTitle(title)) return;
 
-            const priceText = $el.find('.a-price .a-offscreen, .a-price-whole').first().text();
+            const priceText =
+              $el.find('.dcl-product-price-new .a-offscreen').first().text() ||
+              $el.find('.a-price .a-offscreen, .a-price-whole').first().text();
             const price = this.parsePrice(priceText);
-            const origPriceText = $el.find('.a-text-price .a-offscreen, .a-price.a-text-price').first().text();
+            const origPriceText =
+              $el.find('.dcl-product-price-old .a-offscreen').first().text() ||
+              $el.find('.a-text-price .a-offscreen, .a-price.a-text-price').first().text();
             const originalPrice = this.parsePrice(origPriceText);
-            const discountText = $el.find('.savingsPercentage, .a-color-price').first().text();
+            const discountText =
+              $el.find('.dcl-badge').first().text() ||
+              $el.find('.savingsPercentage, .a-color-price').first().text();
             const discountMatch = discountText.match(/(\d+)/);
             const discountPercent = discountMatch
               ? parseFloat(discountMatch[1])
@@ -778,6 +816,7 @@ export class AmazonHttpScraper {
                 ? Math.round(((originalPrice - price) / originalPrice) * 100)
                 : undefined;
             const rawImgUrl =
+              $el.find('img.dcl-dynamic-image').first().attr('src') ||
               $el.find('img[data-a-dynamic-image]').first().attr('src') ||
               $el.find('img.s-image').first().attr('src') ||
               $el.find('img').first().attr('src') ||
