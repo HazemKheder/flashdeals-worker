@@ -18,6 +18,8 @@ const LANGUAGE_CODES: Record<string, { en: string; native: string }> = {
   it: { en: 'en_GB', native: 'it_IT' },
   es: { en: 'en_GB', native: 'es_ES' },
   ca: { en: 'en_CA', native: 'en_CA' },
+  nl: { en: 'en_GB', native: 'nl_NL' },
+  be: { en: 'en_GB', native: 'fr_BE' },
 };
 
 /** Modern deals path: Amazon uses /deals (and .de uses /-/en/deals for English). */
@@ -29,6 +31,8 @@ const DEALS_PATH: Record<string, string> = {
   it: '/deals',
   es: '/deals',
   ca: '/deals',
+  nl: '/deals',
+  be: '/deals',
 };
 
 /** Search path for "Today's Deals" (server-rendered product list when main deals grid is client-only). */
@@ -40,6 +44,8 @@ const DEALS_SEARCH_PATH: Record<string, string> = {
   it: '/s',
   es: '/s',
   ca: '/s',
+  nl: '/s',
+  be: '/s',
 };
 
 /** ASINs we never treat as products (credit cards, etc.). */
@@ -95,6 +101,20 @@ const REGION_CONFIGS: Record<string, RegionConfig> = {
     dealsUrl: 'https://www.amazon.ca/deals',
     couponsUrl: 'https://www.amazon.ca/deals',
   },
+  nl: {
+    code: 'nl',
+    domain: 'amazon.nl',
+    currency: 'EUR',
+    dealsUrl: 'https://www.amazon.nl/deals',
+    couponsUrl: 'https://www.amazon.nl/deals',
+  },
+  be: {
+    code: 'be',
+    domain: 'amazon.com.be',
+    currency: 'EUR',
+    dealsUrl: 'https://www.amazon.com.be/deals',
+    couponsUrl: 'https://www.amazon.com.be/deals',
+  },
 };
 
 export interface CategoryConfig {
@@ -126,6 +146,7 @@ export class AmazonHttpScraper {
     let acceptLang = 'en-US,en;q=0.9';
     if (language?.includes('de')) acceptLang = 'de-DE,de;q=0.9,en;q=0.8';
     else if (language?.includes('fr')) acceptLang = 'fr-FR,fr;q=0.9,en;q=0.8';
+    else if (language?.includes('nl')) acceptLang = 'nl-NL,nl;q=0.9,en;q=0.8';
     else if (language?.includes('it')) acceptLang = 'it-IT,it;q=0.9,en;q=0.8';
     else if (language?.includes('es')) acceptLang = 'es-ES,es;q=0.9,en;q=0.8';
     else if (language?.includes('GB')) acceptLang = 'en-GB,en;q=0.9';

@@ -1,5 +1,5 @@
 /** All Amazon regions this crawler supports. */
-export const ALL_REGIONS = ['de', 'us', 'uk', 'fr', 'it', 'es', 'ca'] as const;
+export const ALL_REGIONS = ['de', 'us', 'uk', 'fr', 'it', 'es', 'nl', 'be', 'ca'] as const;
 export type CronRegion = (typeof ALL_REGIONS)[number];
 
 export const CRON_CATEGORIES = [
@@ -50,7 +50,7 @@ export interface ShardDefinition {
 export const SHARDS: ShardDefinition[] = [
   {
     id: 'shard-1',
-    regions: ['de', 'us'],
+    regions: ['de', 'us', 'be'],
     startOffsetMinutes: 0,
   },
   {
@@ -65,7 +65,7 @@ export const SHARDS: ShardDefinition[] = [
   },
   {
     id: 'shard-4',
-    regions: ['ca'],
+    regions: ['ca', 'nl'],
     startOffsetMinutes: 15,
     secondPass: {
       categories: SECOND_PASS_CATEGORIES,
