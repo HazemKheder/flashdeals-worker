@@ -841,7 +841,8 @@ export class AmazonHttpScraper {
 
   async scrapeProductPage(asin: string, language?: string, merchantId?: string): Promise<ScrapedProduct | null> {
     const url = this.buildProductUrl(asin, merchantId);
-    const html = await this.fetchPage(url, language);
+    const pageLanguage = language || (LANGUAGE_CODES[this.region.code] || LANGUAGE_CODES.de).native;
+    const html = await this.fetchPage(url, pageLanguage);
     if (!html) return null;
 
     const $ = cheerio.load(html);
@@ -963,11 +964,8 @@ export class AmazonHttpScraper {
         const existing = productMap.get(p.asin);
         if (existing) {
           existing.descriptionEn = p.title;
-          existing.title = p.title;
-          // Merge any data that native didn't have
           if (!existing.price && p.price) existing.price = p.price;
           if (!existing.imageUrl && p.imageUrl) existing.imageUrl = p.imageUrl;
-          if (!existing.coupon && p.coupon) existing.coupon = p.coupon;
         } else {
           productMap.set(p.asin, { ...p, descriptionEn: p.title });
         }
@@ -982,9 +980,13 @@ export class AmazonHttpScraper {
     // 3. Enrich every product via its individual page for hi-res images + gallery
     for (const [asin, product] of productMap) {
       await AmazonHttpScraper.delay(delayBetweenRequests);
-      const detailed = await this.scrapeProductPage(asin, languages.en);
+      const detailed = await this.scrapeProductPage(asin, languages.native);
       if (!detailed) continue;
 
+      if (detailed.title) {
+        product.title = detailed.title;
+        product.descriptionDe = detailed.title;
+      }
       if (!product.price && detailed.price) product.price = detailed.price;
       if (!product.originalPrice && detailed.originalPrice) product.originalPrice = detailed.originalPrice;
       if (!product.discountPercent && detailed.discountPercent) product.discountPercent = detailed.discountPercent;

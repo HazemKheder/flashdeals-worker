@@ -142,7 +142,7 @@ export class ScraperScheduler {
           asin: s.asin,
           region_id: regionId,
           title: s.title,
-          description: s.description || s.descriptionEn,
+          description: s.description || s.descriptionDe || s.title,
           description_en: s.descriptionEn,
           description_de: s.descriptionDe,
           price: s.price,
