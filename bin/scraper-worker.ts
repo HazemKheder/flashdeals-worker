@@ -3,12 +3,13 @@ dotenv.config({ path: '.env.local' });
 dotenv.config();
 
 import cron from 'node-cron';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 import {
   ScraperScheduler,
   DealValidator,
   PriceChecker,
   assertWorkerEnv,
+  createServerClient,
 } from '@flashdeals/crawler';
 
 try {
@@ -17,10 +18,8 @@ try {
   process.exit(1);
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey);
+const supabase: SupabaseClient | null = createServerClient();
+if (!supabase) process.exit(1);
 
 interface ScraperConfig {
   id: string;

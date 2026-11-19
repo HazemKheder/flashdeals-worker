@@ -4,11 +4,11 @@ Set these on **every** shard project (`flashdeals-worker-shard-1` … `shard-4`)
 
 | Variable | Source |
 |----------|--------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Same as flashdeals.app |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Same as flashdeals.app |
-| `CRON_SECRET` | Same secret on all shards and (if kept) the website |
+| `NEXT_PUBLIC_SUPABASE_URL` | Project URL, `https://xxxx.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key, `sb_publishable_...` |
+| `CRON_SECRET` | Same secret on all shards and the website |
 
-Never add `SUPABASE_SERVICE_ROLE_KEY`. Writes use the anon key and existing RLS scrape policies.
+Use the publishable key, not the secret key. Writes go through the existing RLS scrape policies.
 
 ## Project settings
 

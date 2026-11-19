@@ -1,7 +1,12 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const URL_VARS = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_URL'] as const;
-const KEY_VARS = ['NEXT_PUBLIC_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY'] as const;
+const KEY_VARS = [
+  'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
+  'SUPABASE_PUBLISHABLE_KEY',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'SUPABASE_ANON_KEY',
+] as const;
 
 function readEnv(name: string): string | undefined {
   const value = process.env[name];
@@ -15,7 +20,6 @@ function schemeOf(value: string): string {
   return match ? match[1].toLowerCase() : 'none';
 }
 
-/** Accept only the API URL. Ignore a postgres connection string stored in SUPABASE_URL. */
 function asHttpUrl(value: string): string | undefined {
   if (/^https?:\/\//i.test(value)) return value;
   if (/^[\w.-]+\.supabase\.co\/?$/i.test(value)) return `https://${value.replace(/\/$/, '')}`;
@@ -46,7 +50,7 @@ export const createServerClient = (): SupabaseClient | null => {
   const url = firstHttpUrl();
   const key = firstKey();
   if (!url || !key) {
-    console.error('Missing a valid Supabase https URL or anon key');
+    console.error('Missing a valid Supabase https URL or publishable key');
     return null;
   }
   try {

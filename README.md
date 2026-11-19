@@ -24,10 +24,10 @@ No region is owned by two shards on the primary pass.
 Copy from `.env.example`. Use the **same** values as the website:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `CRON_SECRET`
 
-Do not set the Supabase service role key.
+Set the publishable key. Do not set the Supabase secret or service role key.
 
 ## Deploy on Vercel
 
