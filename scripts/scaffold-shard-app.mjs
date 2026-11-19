@@ -17,6 +17,8 @@ const packageJson = (id) => `{
   },
   "dependencies": {
     "@flashdeals/crawler": "*",
+    "@supabase/supabase-js": "^2.90.1",
+    "cheerio": "^1.1.2",
     "next": "16.1.2",
     "react": "19.2.3",
     "react-dom": "19.2.3"
@@ -60,7 +62,8 @@ import path from 'node:path';
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@flashdeals/crawler'],
-  // Allow importing the workspace package from outside this app directory.
+  // Keep these as real node_modules so the cron functions can load them.
+  serverExternalPackages: ['cheerio', '@supabase/supabase-js'],
   outputFileTracingRoot: path.join(__dirname, '../..'),
 };
 
@@ -114,35 +117,24 @@ const page = (_id) => `export default function Home() {
 }
 `;
 
-const scrapeRoute = `import { handleScrape } from '@flashdeals/crawler';
-
-export const maxDuration = 60;
+const cronRoute = (handlerPath, exportName) => `export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  return handleScrape(request);
+  try {
+    const handler = await import('${handlerPath}');
+    return await handler.${exportName}(request);
+  } catch (error) {
+    console.error(error);
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return Response.json({ error: message }, { status: 500 });
+  }
 }
 `;
 
-const validateRoute = `import { handleValidate } from '@flashdeals/crawler';
-
-export const maxDuration = 60;
-export const dynamic = 'force-dynamic';
-
-export async function GET(request: Request) {
-  return handleValidate(request);
-}
-`;
-
-const priceCheckRoute = `import { handlePriceCheck } from '@flashdeals/crawler';
-
-export const maxDuration = 60;
-export const dynamic = 'force-dynamic';
-
-export async function GET(request: Request) {
-  return handlePriceCheck(request);
-}
-`;
+const scrapeRoute = cronRoute('@flashdeals/crawler/handlers/scrape', 'handleScrape');
+const validateRoute = cronRoute('@flashdeals/crawler/handlers/validate', 'handleValidate');
+const priceCheckRoute = cronRoute('@flashdeals/crawler/handlers/price-check', 'handlePriceCheck');
 
 function write(filePath, contents) {
   mkdirSync(dirname(filePath), { recursive: true });

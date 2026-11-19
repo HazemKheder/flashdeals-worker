@@ -1,3 +1,4 @@
+import { requestUrl } from '../request-url';
 import { createServerClient } from '../supabase/client';
 import { ScraperScheduler } from '../jobs/scraper-scheduler';
 
@@ -21,7 +22,7 @@ export async function handleScrape(request: Request): Promise<Response> {
       return Response.json({ error: 'Service unavailable' }, { status: 503 });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = requestUrl(request);
     const region = searchParams.get('region') || 'de';
     const maxProducts = parseInt(searchParams.get('maxProducts') || '25', 10);
     const explicitCategory = searchParams.get('category');
@@ -36,6 +37,7 @@ export async function handleScrape(request: Request): Promise<Response> {
     const result = await scheduler.scrapeAllCategories(region, maxProducts);
     return Response.json({ success: true, region, result });
   } catch (error: any) {
+    console.error('[scrape]', error);
     return Response.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

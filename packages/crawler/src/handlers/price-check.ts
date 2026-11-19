@@ -1,3 +1,4 @@
+import { requestUrl } from '../request-url';
 import { createServerClient } from '../supabase/client';
 import { PriceChecker } from '../scrapers/price-checker';
 
@@ -21,7 +22,7 @@ export async function handlePriceCheck(request: Request): Promise<Response> {
       return Response.json({ error: 'Service unavailable' }, { status: 503 });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = requestUrl(request);
     const region = searchParams.get('region') || 'de';
     const maxProducts = parseInt(searchParams.get('maxProducts') || '50', 10);
     const categorySlug = searchParams.get('category');
@@ -42,6 +43,7 @@ export async function handlePriceCheck(request: Request): Promise<Response> {
 
     return Response.json({ success: true, region, category: categorySlug ?? 'all', result });
   } catch (error: any) {
+    console.error('[price-check]', error);
     return Response.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

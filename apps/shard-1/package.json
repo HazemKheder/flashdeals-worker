@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@flashdeals/crawler": "*",
+    "@supabase/supabase-js": "^2.90.1",
+    "cheerio": "^1.1.2",
     "next": "16.1.2",
     "react": "19.2.3",
     "react-dom": "19.2.3"

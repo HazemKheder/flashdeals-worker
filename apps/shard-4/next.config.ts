@@ -3,7 +3,8 @@ import path from 'node:path';
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@flashdeals/crawler'],
-  // Allow importing the workspace package from outside this app directory.
+  // Keep these as real node_modules so the cron functions can load them.
+  serverExternalPackages: ['cheerio', '@supabase/supabase-js'],
   outputFileTracingRoot: path.join(__dirname, '../..'),
 };
 

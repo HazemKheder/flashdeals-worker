@@ -1,3 +1,4 @@
+import { requestUrl } from '../request-url';
 import { createServerClient } from '../supabase/client';
 import { DealValidator } from '../scrapers/deal-validator';
 
@@ -21,7 +22,7 @@ export async function handleValidate(request: Request): Promise<Response> {
       return Response.json({ error: 'Service unavailable' }, { status: 503 });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = requestUrl(request);
     const region = searchParams.get('region') || 'de';
     const maxProducts = parseInt(searchParams.get('maxProducts') || '25', 10);
     const delayMs = parseInt(searchParams.get('delay') || '1500', 10);
@@ -43,6 +44,7 @@ export async function handleValidate(request: Request): Promise<Response> {
 
     return Response.json({ success: true, region, category: categorySlug ?? 'all', result });
   } catch (error: any) {
+    console.error('[validate]', error);
     return Response.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
