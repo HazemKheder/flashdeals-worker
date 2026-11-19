@@ -45,7 +45,7 @@ function firstKey(): string | undefined {
   return undefined;
 }
 
-/** Reads env at call time so a value added in Vercel after build is still visible. */
+/** Reads env at call time. A new Vercel deployment is required after changing the publishable key. */
 export const createServerClient = (): SupabaseClient | null => {
   const url = firstHttpUrl();
   const key = firstKey();
