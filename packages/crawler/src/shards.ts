@@ -19,9 +19,10 @@ export const CRON_CATEGORIES = [
 export type CronCategory = (typeof CRON_CATEGORIES)[number];
 
 export const CRON_JOBS = [
-  { id: 'scrape', path: 'scrape', maxProducts: 25 },
-  { id: 'validate', path: 'validate', maxProducts: 25 },
-  { id: 'price-check', path: 'price-check', maxProducts: 50 },
+  // Keep scrape batches small so each Vercel Hobby invocation finishes under 60s.
+  { id: 'scrape', path: 'scrape', maxProducts: 10 },
+  { id: 'validate', path: 'validate', maxProducts: 15 },
+  { id: 'price-check', path: 'price-check', maxProducts: 30 },
 ] as const;
 
 /** Lower-priority categories skipped for price-check. */

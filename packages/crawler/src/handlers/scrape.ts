@@ -24,17 +24,30 @@ export async function handleScrape(request: Request): Promise<Response> {
 
     const { searchParams } = requestUrl(request);
     const region = searchParams.get('region') || 'de';
-    const maxProducts = parseInt(searchParams.get('maxProducts') || '25', 10);
+    const maxProducts = parseInt(searchParams.get('maxProducts') || '10', 10);
+    const delayMs = parseInt(searchParams.get('delayMs') || '800', 10);
+    const budgetMs = parseInt(searchParams.get('budgetMs') || '50000', 10);
     const explicitCategory = searchParams.get('category');
+    const discoverOptions = {
+      enrichMissingOnly: true,
+      maxEnrich: maxProducts,
+      deadlineAt: Date.now() + budgetMs,
+    };
 
     const scheduler = new ScraperScheduler(supabase);
 
     if (explicitCategory) {
-      const result = await scheduler.scrapeCategory(region, explicitCategory, maxProducts);
+      const result = await scheduler.scrapeCategory(
+        region,
+        explicitCategory,
+        maxProducts,
+        delayMs,
+        discoverOptions,
+      );
       return Response.json({ success: true, region, category: explicitCategory, result });
     }
 
-    const result = await scheduler.scrapeAllCategories(region, maxProducts);
+    const result = await scheduler.scrapeAllCategories(region, maxProducts, delayMs);
     return Response.json({ success: true, region, result });
   } catch (error: any) {
     console.error('[scrape]', error);

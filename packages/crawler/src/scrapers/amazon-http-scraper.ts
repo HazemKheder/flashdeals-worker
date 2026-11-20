@@ -123,6 +123,16 @@ export interface CategoryConfig {
   amazonBubbleId: string;
 }
 
+/** Options that keep serverless scrapes inside Vercel's time budget. */
+export interface DiscoverOptions {
+  /** Cap how many product detail pages to fetch. Default: all products. */
+  maxEnrich?: number;
+  /** Only detail-fetch products missing price, image, or title. Default: false. */
+  enrichMissingOnly?: boolean;
+  /** Stop enrichment once Date.now() exceeds this timestamp. */
+  deadlineAt?: number;
+}
+
 export class AmazonHttpScraper {
   private region: RegionConfig;
 
@@ -1007,9 +1017,13 @@ export class AmazonHttpScraper {
     category: CategoryConfig | null,
     maxProducts: number,
     delayBetweenRequests: number,
+    options: DiscoverOptions = {},
   ): Promise<Map<string, ScrapedProduct>> {
     const productMap = new Map<string, ScrapedProduct>();
     const languages = LANGUAGE_CODES[this.region.code] || LANGUAGE_CODES.de;
+    const enrichMissingOnly = options.enrichMissingOnly ?? false;
+    const maxEnrich = options.maxEnrich ?? Number.POSITIVE_INFINITY;
+    const deadlineAt = options.deadlineAt;
 
     const nativeProducts = await this.scrapeDealsPage(category, languages.native, maxProducts);
     for (const p of nativeProducts) {
@@ -1018,6 +1032,7 @@ export class AmazonHttpScraper {
 
     // 2. Fetch deals page in English (if different from native)
     if (languages.en !== languages.native) {
+      if (deadlineAt != null && Date.now() >= deadlineAt) return productMap;
       await AmazonHttpScraper.delay(delayBetweenRequests);
       const enProducts = await this.scrapeDealsPage(category, languages.en, maxProducts);
       for (const p of enProducts) {
@@ -1037,10 +1052,18 @@ export class AmazonHttpScraper {
       }
     }
 
-    // 3. Enrich every product via its individual page for hi-res images + gallery
+    // 3. Enrich product pages for missing fields / higher-res images (time-budgeted)
+    let enriched = 0;
     for (const [asin, product] of productMap) {
+      if (enriched >= maxEnrich) break;
+      if (deadlineAt != null && Date.now() >= deadlineAt) break;
+      if (enrichMissingOnly && product.price && product.imageUrl && product.title) continue;
+
       await AmazonHttpScraper.delay(delayBetweenRequests);
+      if (deadlineAt != null && Date.now() >= deadlineAt) break;
+
       const detailed = await this.scrapeProductPage(asin, languages.native);
+      enriched += 1;
       if (!detailed) continue;
 
       if (detailed.title) {

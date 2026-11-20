@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { AmazonHttpScraper, CategoryConfig } from '../scrapers/amazon-http-scraper';
+import { AmazonHttpScraper, CategoryConfig, DiscoverOptions } from '../scrapers/amazon-http-scraper';
 import { PriceChecker } from '../scrapers/price-checker';
 import { createServerClient } from '../supabase/client';
 import { ScrapedProduct } from '../types/product';
@@ -251,7 +251,8 @@ export class ScraperScheduler {
     regionCode: string,
     categorySlug: string,
     maxProducts: number = 50,
-    delayBetweenRequests: number = 3000,
+    delayBetweenRequests: number = 1000,
+    discoverOptions: DiscoverOptions = {},
   ): Promise<JobResult> {
     const result: JobResult = {
       productsScraped: 0,
@@ -279,7 +280,12 @@ export class ScraperScheduler {
       };
 
       try {
-        const productMap = await scraper.discoverDeals(categoryConfig, maxProducts, delayBetweenRequests);
+        const productMap = await scraper.discoverDeals(
+          categoryConfig,
+          maxProducts,
+          delayBetweenRequests,
+          discoverOptions,
+        );
         const products = Array.from(productMap.values());
         result.productsScraped = products.length;
 
@@ -323,8 +329,8 @@ export class ScraperScheduler {
   async scrapeAllCategories(
     regionCode: string,
     maxProductsPerCategory: number = 30,
-    delayBetweenRequests: number = 3000,
-    delayBetweenCategories: number = 10000,
+    delayBetweenRequests: number = 1000,
+    delayBetweenCategories: number = 5000,
   ): Promise<JobResult> {
     const result: JobResult = {
       productsScraped: 0,
