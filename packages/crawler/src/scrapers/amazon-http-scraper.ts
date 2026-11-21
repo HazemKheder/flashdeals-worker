@@ -51,6 +51,121 @@ const DEALS_SEARCH_PATH: Record<string, string> = {
 /** ASINs we never treat as products (credit cards, etc.). */
 const NON_PRODUCT_ASINS = new Set<string>(['B0CN8XJB15', 'B08HYJ6K1J']);
 
+/**
+ * Department search queries used when bubble-id deal pages return the global
+ * featured grid (common during Black Friday / Prime events).
+ */
+const CATEGORY_SEARCH: Record<string, Record<string, { query: string; index: string }>> = {
+  de: {
+    garden: { query: 'garten', index: 'garden' },
+    fashion: { query: 'mode', index: 'fashion' },
+    'home-kitchen': { query: 'küche haushalt', index: 'kitchen' },
+    computers: { query: 'computer', index: 'computers' },
+    beauty: { query: 'beauty', index: 'beauty' },
+    toys: { query: 'spielzeug', index: 'toys' },
+    automotive: { query: 'auto', index: 'automotive' },
+    grocery: { query: 'lebensmittel', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'electronics' },
+    baby: { query: 'baby', index: 'baby' },
+  },
+  us: {
+    garden: { query: 'garden', index: 'lawn-garden' },
+    fashion: { query: 'clothing', index: 'fashion' },
+    'home-kitchen': { query: 'home kitchen', index: 'kitchen' },
+    computers: { query: 'computer', index: 'computers' },
+    beauty: { query: 'beauty', index: 'beauty' },
+    toys: { query: 'toys', index: 'toys-and-games' },
+    automotive: { query: 'automotive', index: 'automotive' },
+    grocery: { query: 'grocery', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'mobile' },
+    baby: { query: 'baby', index: 'baby-products' },
+  },
+  uk: {
+    garden: { query: 'garden', index: 'garden' },
+    fashion: { query: 'clothing', index: 'clothing' },
+    'home-kitchen': { query: 'home kitchen', index: 'kitchen' },
+    computers: { query: 'computer', index: 'computers' },
+    beauty: { query: 'beauty', index: 'beauty' },
+    toys: { query: 'toys', index: 'toys' },
+    automotive: { query: 'car', index: 'automotive' },
+    grocery: { query: 'grocery', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'electronics' },
+    baby: { query: 'baby', index: 'baby' },
+  },
+  fr: {
+    garden: { query: 'jardin', index: 'garden' },
+    fashion: { query: 'mode', index: 'clothing' },
+    'home-kitchen': { query: 'cuisine', index: 'kitchen' },
+    computers: { query: 'ordinateur', index: 'computers' },
+    beauty: { query: 'beauté', index: 'beauty' },
+    toys: { query: 'jouets', index: 'toys' },
+    automotive: { query: 'auto', index: 'automotive' },
+    grocery: { query: 'épicerie', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'electronics' },
+    baby: { query: 'bébé', index: 'baby' },
+  },
+  it: {
+    garden: { query: 'giardino', index: 'garden' },
+    fashion: { query: 'moda', index: 'fashion' },
+    'home-kitchen': { query: 'casa cucina', index: 'kitchen' },
+    computers: { query: 'computer', index: 'computers' },
+    beauty: { query: 'bellezza', index: 'beauty' },
+    toys: { query: 'giocattoli', index: 'toys' },
+    automotive: { query: 'auto', index: 'automotive' },
+    grocery: { query: 'alimentari', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'electronics' },
+    baby: { query: 'bambini', index: 'baby' },
+  },
+  es: {
+    garden: { query: 'jardín', index: 'garden' },
+    fashion: { query: 'moda', index: 'fashion' },
+    'home-kitchen': { query: 'hogar cocina', index: 'kitchen' },
+    computers: { query: 'ordenador', index: 'computers' },
+    beauty: { query: 'belleza', index: 'beauty' },
+    toys: { query: 'juguetes', index: 'toys' },
+    automotive: { query: 'coche', index: 'automotive' },
+    grocery: { query: 'alimentación', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'electronics' },
+    baby: { query: 'bebé', index: 'baby' },
+  },
+  nl: {
+    garden: { query: 'tuin', index: 'garden' },
+    fashion: { query: 'mode', index: 'fashion' },
+    'home-kitchen': { query: 'keuken', index: 'kitchen' },
+    computers: { query: 'computer', index: 'computers' },
+    beauty: { query: 'beauty', index: 'beauty' },
+    toys: { query: 'speelgoed', index: 'toys' },
+    automotive: { query: 'auto', index: 'automotive' },
+    grocery: { query: 'boodschappen', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'electronics' },
+    baby: { query: 'baby', index: 'baby' },
+  },
+  be: {
+    garden: { query: 'jardin', index: 'garden' },
+    fashion: { query: 'mode', index: 'fashion' },
+    'home-kitchen': { query: 'cuisine', index: 'kitchen' },
+    computers: { query: 'ordinateur', index: 'computers' },
+    beauty: { query: 'beauté', index: 'beauty' },
+    toys: { query: 'jouets', index: 'toys' },
+    automotive: { query: 'auto', index: 'automotive' },
+    grocery: { query: 'épicerie', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'electronics' },
+    baby: { query: 'bébé', index: 'baby' },
+  },
+  ca: {
+    garden: { query: 'garden', index: 'lawn-garden' },
+    fashion: { query: 'clothing', index: 'fashion' },
+    'home-kitchen': { query: 'home kitchen', index: 'kitchen' },
+    computers: { query: 'computer', index: 'computers' },
+    beauty: { query: 'beauty', index: 'beauty' },
+    toys: { query: 'toys', index: 'toys' },
+    automotive: { query: 'automotive', index: 'automotive' },
+    grocery: { query: 'grocery', index: 'grocery' },
+    smartphones: { query: 'smartphone', index: 'electronics' },
+    baby: { query: 'baby', index: 'baby' },
+  },
+};
+
 const REGION_CONFIGS: Record<string, RegionConfig> = {
   de: {
     code: 'de',
@@ -1007,6 +1122,165 @@ export class AmazonHttpScraper {
       isPrime,
       coupon,
     };
+  }
+
+  buildCategorySearchUrl(
+    categorySlug: string,
+    language?: string,
+    options: { withIndex?: boolean } = {},
+  ): string | null {
+    const config = CATEGORY_SEARCH[this.region.code]?.[categorySlug];
+    if (!config) return null;
+    const path = DEALS_SEARCH_PATH[this.region.code] ?? '/s';
+    const params = new URLSearchParams();
+    params.set('k', config.query);
+    if (options.withIndex !== false) params.set('i', config.index);
+    params.set('s', 'exact-aware-popularity-rank');
+    if (language) params.set('language', language);
+    return `https://www.${this.region.domain}${path}?${params.toString()}`;
+  }
+
+  private parseSearchResultsHtml(
+    html: string,
+    category: CategoryConfig,
+    maxProducts: number,
+  ): ScrapedProduct[] {
+    const $ = cheerio.load(html);
+    const products: ScrapedProduct[] = [];
+    const seen = new Set<string>();
+
+    $('[data-component-type="s-search-result"]').each((_, element) => {
+      if (products.length >= maxProducts) return false;
+      const $el = $(element);
+      const asin = ($el.attr('data-asin') || '').trim();
+      if (!asin || seen.has(asin) || NON_PRODUCT_ASINS.has(asin)) return;
+      seen.add(asin);
+
+      const title =
+        $el.find('h2 a span').first().text().trim() ||
+        $el.find('h2').first().text().trim() ||
+        $el.find('img').first().attr('alt') ||
+        '';
+      if (!title || title.length < 5 || this.isNonProductTitle(title)) return;
+
+      const priceText =
+        $el.find('.a-price .a-offscreen').first().text() ||
+        $el.find('.a-price-whole').first().text();
+      const price = this.parsePrice(priceText);
+      const origPriceText = $el.find('.a-text-price .a-offscreen').first().text();
+      const originalPrice = this.parsePrice(origPriceText);
+      const discountPercent =
+        price && originalPrice && originalPrice > price
+          ? Math.round(((originalPrice - price) / originalPrice) * 100)
+          : undefined;
+      const rawImg =
+        $el.find('img.s-image').first().attr('src') ||
+        $el.find('img').first().attr('src');
+      const imageUrl = AmazonHttpScraper.upscaleImageUrl(rawImg ?? undefined);
+      const ratingText = $el.find('.a-icon-alt').first().text();
+      const rating = this.parseRating(ratingText);
+      const href = $el.find('h2 a').first().attr('href') || `/dp/${asin}`;
+      const productUrl = href.startsWith('http') ? href : `https://www.${this.region.domain}${href}`;
+
+      products.push({
+        asin,
+        title,
+        price: price || undefined,
+        originalPrice: originalPrice || undefined,
+        discountPercent,
+        currency: this.region.currency,
+        imageUrl: imageUrl || undefined,
+        productUrl,
+        rating: rating || undefined,
+        categoryId: category.id,
+      });
+    });
+
+    return products;
+  }
+
+  async scrapeCategorySearchPage(
+    category: CategoryConfig,
+    language: string,
+    maxProducts: number,
+  ): Promise<ScrapedProduct[]> {
+    const primaryUrl = this.buildCategorySearchUrl(category.slug, language, { withIndex: true });
+    if (!primaryUrl) return [];
+
+    const primaryHtml = await this.fetchPage(primaryUrl, language);
+    let products = primaryHtml
+      ? this.parseSearchResultsHtml(primaryHtml, category, maxProducts)
+      : [];
+
+    // Some marketplaces reject department indexes; retry as a plain keyword search.
+    if (products.length === 0) {
+      const fallbackUrl = this.buildCategorySearchUrl(category.slug, language, { withIndex: false });
+      if (fallbackUrl && fallbackUrl !== primaryUrl) {
+        await AmazonHttpScraper.delay(600);
+        const fallbackHtml = await this.fetchPage(fallbackUrl, language);
+        if (fallbackHtml) {
+          products = this.parseSearchResultsHtml(fallbackHtml, category, maxProducts);
+        }
+      }
+    }
+
+    return products;
+  }
+
+  /**
+   * Fallback discovery via department search when bubble pages are polluted
+   * with unrelated featured deals.
+   */
+  async discoverCategorySearchDeals(
+    category: CategoryConfig,
+    maxProducts: number,
+    delayBetweenRequests: number,
+    options: DiscoverOptions = {},
+  ): Promise<Map<string, ScrapedProduct>> {
+    const productMap = new Map<string, ScrapedProduct>();
+    const languages = LANGUAGE_CODES[this.region.code] || LANGUAGE_CODES.de;
+    const enrichMissingOnly = options.enrichMissingOnly ?? false;
+    const maxEnrich = options.maxEnrich ?? Number.POSITIVE_INFINITY;
+    const deadlineAt = options.deadlineAt;
+
+    const nativeProducts = await this.scrapeCategorySearchPage(
+      category,
+      languages.native,
+      maxProducts,
+    );
+    for (const p of nativeProducts) {
+      productMap.set(p.asin, { ...p, descriptionDe: p.title, descriptionEn: p.title });
+    }
+
+    let enriched = 0;
+    for (const [asin, product] of productMap) {
+      if (enriched >= maxEnrich) break;
+      if (deadlineAt != null && Date.now() >= deadlineAt) break;
+      if (enrichMissingOnly && product.price && product.imageUrl && product.title) continue;
+
+      await AmazonHttpScraper.delay(delayBetweenRequests);
+      if (deadlineAt != null && Date.now() >= deadlineAt) break;
+
+      const detailed = await this.scrapeProductPage(asin, languages.native);
+      enriched += 1;
+      if (!detailed) continue;
+
+      if (detailed.title) {
+        product.title = detailed.title;
+        product.descriptionDe = detailed.title;
+      }
+      if (!product.price && detailed.price) product.price = detailed.price;
+      if (!product.originalPrice && detailed.originalPrice) product.originalPrice = detailed.originalPrice;
+      if (!product.discountPercent && detailed.discountPercent) product.discountPercent = detailed.discountPercent;
+      if (detailed.imageUrl) product.imageUrl = detailed.imageUrl;
+      if (detailed.imageUrls?.length) product.imageUrls = detailed.imageUrls;
+      if (!product.rating && detailed.rating) product.rating = detailed.rating;
+      if (!product.reviewCount && detailed.reviewCount) product.reviewCount = detailed.reviewCount;
+      if (!product.coupon && detailed.coupon) product.coupon = detailed.coupon;
+      if (!product.isPrime && detailed.isPrime) product.isPrime = detailed.isPrime;
+    }
+
+    return productMap;
   }
 
   // ---------------------------------------------------------------------------

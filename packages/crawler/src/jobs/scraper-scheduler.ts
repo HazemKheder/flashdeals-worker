@@ -3,6 +3,9 @@ import { AmazonHttpScraper, CategoryConfig, DiscoverOptions } from '../scrapers/
 import { PriceChecker } from '../scrapers/price-checker';
 import { createServerClient } from '../supabase/client';
 import { ScrapedProduct } from '../types/product';
+import { matchesCategory } from '../category-relevance';
+
+const DEAL_TYPE_SLUGS = new Set(['coupons', 'lightning-deals']);
 
 interface JobResult {
   productsScraped: number;
@@ -28,6 +31,10 @@ export class ScraperScheduler {
     if (!client) throw new Error('Supabase client not available — check env vars');
     this.supabase = client;
   }
+
+  // ---------------------------------------------------------------------------
+  // Job tracking
+  // ---------------------------------------------------------------------------
 
   private async createJob(regionId: string, jobType: string, categoryId?: string): Promise<string | null> {
     const { data, error } = await this.supabase
@@ -66,6 +73,10 @@ export class ScraperScheduler {
     await this.supabase.from('scraping_jobs').update(updateData).eq('id', jobId);
   }
 
+  // ---------------------------------------------------------------------------
+  // Lookups
+  // ---------------------------------------------------------------------------
+
   private async getRegion(regionCode: string): Promise<{ id: string; currency: string } | null> {
     const { data, error } = await this.supabase
       .from('regions')
@@ -100,10 +111,15 @@ export class ScraperScheduler {
     return data;
   }
 
+  // ---------------------------------------------------------------------------
+  // Product / deal / coupon persistence
+  // ---------------------------------------------------------------------------
+
   private sanitizeProduct(product: ScrapedProduct): ScrapedProduct {
     const price = product.price && product.price <= 9999999.99 ? product.price : undefined;
     let originalPrice = product.originalPrice && product.originalPrice <= 9999999.99 ? product.originalPrice : undefined;
 
+    // original_price must be higher than price; discard if nonsensical
     if (originalPrice != null && price != null && originalPrice <= price) {
       originalPrice = undefined;
     }
@@ -128,10 +144,41 @@ export class ScraperScheduler {
     regionId: string,
     currency: string,
     categoryId?: string,
+    categorySlug?: string,
   ): Promise<string | null> {
     const s = this.sanitizeProduct(product);
 
+    // Skip products missing essential data
     if (!s.price || !s.imageUrl || !s.title || s.title.length < 10) {
+      return null;
+    }
+
+    const titleFitsCategory =
+      !categorySlug || !categoryId ? true : matchesCategory(categorySlug, s.title);
+
+    const { data: existing } = await this.supabase
+      .from('products')
+      .select('id, category_id')
+      .eq('asin', s.asin)
+      .eq('region_id', regionId)
+      .maybeSingle();
+
+    // Deal-type feeds must not steal products that already have a department.
+    const scrapingDealType = !!(categorySlug && DEAL_TYPE_SLUGS.has(categorySlug));
+
+    let nextCategoryId = existing?.category_id || null;
+    if (titleFitsCategory && categoryId) {
+      if (scrapingDealType && existing?.category_id) {
+        nextCategoryId = existing.category_id;
+      } else {
+        nextCategoryId = categoryId;
+      }
+    } else if (!titleFitsCategory) {
+      nextCategoryId = existing?.category_id || null;
+    }
+
+    // During a category scrape, skip unrelated featured deals entirely.
+    if (categorySlug && categoryId && !titleFitsCategory) {
       return null;
     }
 
@@ -153,7 +200,7 @@ export class ScraperScheduler {
           image_urls: s.imageUrls,
           product_url: s.productUrl,
           category: s.category,
-          category_id: categoryId || s.categoryId,
+          category_id: nextCategoryId,
           brand: s.brand,
           rating: s.rating,
           review_count: s.reviewCount,
@@ -197,6 +244,7 @@ export class ScraperScheduler {
       (discountType === 'percentage'
         ? `${discountValue}% off with coupon`
         : `${product.currency} ${discountValue} off with coupon`);
+    // Strip any leaked CSS rules (e.g. ".newCouponBadge { ... }")
     rawTitle = (rawTitle ?? 'Coupon').replace(/\.[a-zA-Z_][\w-]*\s*\{[^}]*\}/g, '').replace(/\s{2,}/g, ' ').trim();
     const title = (rawTitle || 'Coupon').slice(0, 255);
 
@@ -247,6 +295,10 @@ export class ScraperScheduler {
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // Scraping orchestration
+  // ---------------------------------------------------------------------------
+
   async scrapeCategory(
     regionCode: string,
     categorySlug: string,
@@ -280,20 +332,51 @@ export class ScraperScheduler {
       };
 
       try {
-        const productMap = await scraper.discoverDeals(
+        // Prefer department search first — bubble-id pages often return the same
+        // Black Friday featured grid for every category.
+        const productMap = await scraper.discoverCategorySearchDeals(
           categoryConfig,
           maxProducts,
           delayBetweenRequests,
           discoverOptions,
         );
-        const products = Array.from(productMap.values());
+
+        let products = Array.from(productMap.values()).filter((product) =>
+          matchesCategory(category.slug, product.title, 'exclude-only'),
+        );
+
+        if (products.length < maxProducts) {
+          const bubbleProducts = await scraper.discoverDeals(
+            categoryConfig,
+            maxProducts,
+            delayBetweenRequests,
+            discoverOptions,
+          );
+          for (const [asin, product] of bubbleProducts) {
+            // Bubble results are untrusted during big events — require a title match.
+            if (!matchesCategory(category.slug, product.title, 'strict')) continue;
+            if (!productMap.has(asin)) productMap.set(asin, product);
+          }
+          products = Array.from(productMap.values()).filter((product) =>
+            matchesCategory(category.slug, product.title, 'exclude-only') ||
+            matchesCategory(category.slug, product.title, 'strict'),
+          );
+        }
+
+        products = products.slice(0, maxProducts);
         result.productsScraped = products.length;
 
         const priceChecker = new PriceChecker(this.supabase);
 
         for (const product of products) {
           try {
-            const productId = await this.upsertProduct(product, region.id, region.currency, category.id);
+            const productId = await this.upsertProduct(
+              product,
+              region.id,
+              region.currency,
+              category.id,
+              category.slug,
+            );
             if (productId) {
               await this.createDeal(productId, product);
               if (product.discountPercent && product.discountPercent >= 5) result.dealsFound++;
@@ -302,6 +385,7 @@ export class ScraperScheduler {
               if (couponCreated) result.couponsFound++;
 
               if (product.price) {
+                // Use the effective price (voucher price if lower than listed price)
                 const vp = product.coupon?.voucherPrice;
                 const effectivePrice = (vp != null && vp > 0 && vp < product.price) ? vp : product.price;
                 await this.logPriceObservation(productId, effectivePrice, product.originalPrice ?? null);
